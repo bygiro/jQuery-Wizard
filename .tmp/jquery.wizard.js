@@ -8,81 +8,81 @@
 
 // compatibility for jQuery / jqLite
 var bg = bg || false;
-if(!bg && typeof jQuery == 'undefined'){
-	bg = angular.element;
-	
-	(function(){
-		bg.extend = angular.extend;
-		bg.isFunction = angular.isFunction;
-	
-		function selectResult(elem, selector) {
-			if (elem.length == 1)
-				return elem[0].querySelectorAll(selector);
-			else {
-				var matches = [];
-				for(var i=0;i<elem.length;i++){
-					var elm = elem[i];
-					var nodes = angular.element(elm.querySelectorAll(selector));
-					matches.push.apply(matches, nodes.slice());					
-				}
-				return matches;
-
-			}
-
-		}	
-	
-		bg.prototype.find = function (selector){			
-			var context = this[0];
-			// Early return if context is not an element or document
-			if (!context || (context.nodeType !== 1 && context.nodeType !== 9) || !angular.isString(selector)) {
-				return [];
-			}
-			var matches = [];
-			if (selector.charAt(0) === '>')
-				selector = ':scope ' + selector;
-			if (selector.indexOf(':visible') > -1) {
-				var elems = angular.element(selectResult(this, selector.split(':visible')[0]))
-
-				forEach(elems, function (val, i) {
-					if (angular.element(val).is(':visible'))
-						matches.push(val);
-				})
-
-			} else {
-				matches = selectResult(this, selector)
-			}
-
-			if (matches.length) {
-				if (matches.length == 1)
-					return angular.element(matches[0])
+if(!bg){
+	if(typeof jQuery != 'undefined'){
+		bg = jQuery;
+	} else if(typeof angular != 'undefined'){
+		bg = angular.element;
+		
+		(function(){
+			bg.extend = angular.extend;
+			bg.isFunction = angular.isFunction;
+		
+			function selectResult(elem, selector) {
+				if (elem.length == 1)
+					return elem[0].querySelectorAll(selector);
 				else {
-					return angular.element(matches);
-				}
-			}
-			return angular.element();
-		};
-		
-		bg.prototype.outerWidth = function () {
-			var el = this[0];
-			if(typeof el == 'undefined') return null;
-			return el.offsetWidth;
-		};
-		
-		bg.prototype.width = function () {
-			var el = this[0];
-			if(typeof el == 'undefined') return null;
-			var computedStyle = getComputedStyle(el);
-			var width = el.offsetWidth;
-			if (computedStyle)
-				width -= parseFloat(computedStyle.paddingLeft) + parseFloat(computedStyle.paddingRight);
-			return width;
-		};
-	
-	})();
+					var matches = [];
+					for(var i=0;i<elem.length;i++){
+						var elm = elem[i];
+						var nodes = angular.element(elm.querySelectorAll(selector));
+						matches.push.apply(matches, nodes.slice());					
+					}
+					return matches;
 
-	
-} else {
-	bg = jQuery;
+				}
+
+			}	
+		
+			bg.prototype.find = function (selector){			
+				var context = this[0];
+				// Early return if context is not an element or document
+				if (!context || (context.nodeType !== 1 && context.nodeType !== 9) || !angular.isString(selector)) {
+					return [];
+				}
+				var matches = [];
+				if (selector.charAt(0) === '>')
+					selector = ':scope ' + selector;
+				if (selector.indexOf(':visible') > -1) {
+					var elems = angular.element(selectResult(this, selector.split(':visible')[0]))
+
+					forEach(elems, function (val, i) {
+						if (angular.element(val).is(':visible'))
+							matches.push(val);
+					})
+
+				} else {
+					matches = selectResult(this, selector)
+				}
+
+				if (matches.length) {
+					if (matches.length == 1)
+						return angular.element(matches[0])
+					else {
+						return angular.element(matches);
+					}
+				}
+				return angular.element();
+			};
+			
+			bg.prototype.outerWidth = function () {
+				var el = this[0];
+				if(typeof el == 'undefined') return null;
+				return el.offsetWidth;
+			};
+			
+			bg.prototype.width = function () {
+				var el = this[0];
+				if(typeof el == 'undefined') return null;
+				var computedStyle = getComputedStyle(el);
+				var width = el.offsetWidth;
+				if (computedStyle)
+					width -= parseFloat(computedStyle.paddingLeft) + parseFloat(computedStyle.paddingRight);
+				return width;
+			};
+		
+		})();
+	}
 }
  
 ;(function ($, document, window){
