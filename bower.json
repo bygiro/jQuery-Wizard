@@ -1,0 +1,35 @@
+{
+  "name": "jquery-wizard-plugin",
+  "version": "v0.0.1",
+  "authors": [
+    "ByGiro <girotomaselli@gmail.com>"
+  ],
+  "contributors": [],
+  "main": [
+	"dist/jquery.wizard.js",
+	"dist/jquery.wizard.min.js"
+  ],
+  "description": "A simple plugin to convert a regular form into a wizard form.",
+  "keywords": [
+    "form",
+    "ByGiro",
+    "bootstrap",
+    "wizard"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "jquery": ">=1.8.x",
+    "bootstrap": ">=2.3.x"
+  },
+  "devDependencies": {
+    "chai": "~1.9.1",
+    "mocha": "~1.21.4"
+  }
+}
