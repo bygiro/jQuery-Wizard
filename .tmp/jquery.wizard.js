@@ -292,6 +292,14 @@ if(!bg){
 			
 			attachEventsHandler.call(this);
 			
+			var callbacks = ['checkStep','onCompleted'],cb;
+			for(var i=0;i<callbacks.length;i++){
+				cb = callbacks[i];
+				if(typeof this.options[cb] == 'string' && typeof window[this.options[cb]] == 'function'){
+					this.options[cb] = window[this.options[cb]];
+				}
+			}
+		
 			checkStatus.call(this);
 		},
 
@@ -336,6 +344,6 @@ if(!bg){
 
 	$(document).ready(function(){
 		var mySelector = document.querySelector('[data-wizard-init]');
-		$(mySelector).wizardByGiro({});				
+		$(mySelector)[ pluginName ]({});				
 	});
 }(bg, document, window));
