@@ -1,6 +1,6 @@
 /*
  * jQuery / jqLite Wizard Plugin
- * version: 0.0.2
+ * version: 0.0.3
  * Author: Girolamo Tomaselli http://bygiro.com
  *
  * Copyright (c) 2013 G. Tomaselli
@@ -19,7 +19,7 @@ if(!bg){
 			bg.extend = angular.extend;
 			bg.isFunction = angular.isFunction;
 		
-			function selectResult(elem, selector) {
+			function selectResult(elem, selector){
 				if (elem.length == 1)
 					return elem[0].querySelectorAll(selector);
 				else {
@@ -112,7 +112,7 @@ if(!bg){
 	attachEventsHandler = function(){
 		var that = this;
 		
-		that.$element.find('.btn-prev:not(.disabled.hidden)').on('click', function(e){
+		that.$element.find('.btn-prev:not(.disabled):not(.hidden)').on('click', function(e){
 			e.stopPropagation();
 			that.previous.call(that,e);
 		});	
