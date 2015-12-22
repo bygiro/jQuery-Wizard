@@ -1,5 +1,6 @@
 /*
  * jQuery / jqLite Wizard Plugin
+ * version: 0.0.2
  * Author: Girolamo Tomaselli http://bygiro.com
  *
  * Copyright (c) 2013 G. Tomaselli
@@ -111,7 +112,7 @@ if(!bg){
 	attachEventsHandler = function(){
 		var that = this;
 		
-		that.$element.find('.btn-prev:not(.disabled)').on('click', function(e){
+		that.$element.find('.btn-prev:not(.disabled.hidden)').on('click', function(e){
 			e.stopPropagation();
 			that.previous.call(that,e);
 		});	
@@ -168,12 +169,12 @@ if(!bg){
 		
 		// set buttons based on current step
 		that.$element.find('.btn-next').removeClass('final-step btn-success');
-		that.$element.find('.btn-prev').removeClass('disabled');
+		that.$element.find('.btn-prev').removeClass('disabled hidden');
 		if(that.currentStep == stepsItems.length){
 			// we are in the last step
 			that.$element.find('.btn-next').addClass('final-step btn-success');
 		} else if(that.currentStep == 1){
-			that.$element.find('.btn-prev').addClass('disabled');
+			that.$element.find('.btn-prev').addClass('disabled hidden');
 		}		
 		
 		// move steps view if needed
@@ -223,7 +224,7 @@ if(!bg){
 		
 		if(triggerEnd){
 			if(typeof this.options.onCompleted == 'function'){
-				this.options.onCompleted();
+				this.options.onCompleted(this);
 			} else if(this.options.autoSubmit) {
 				// search if wizard is inside a form and submit it.
 				var form = this.$element.closest('form');
@@ -275,7 +276,7 @@ if(!bg){
 			var stepsLi = this.$element.find('.steps > li');
 			for(var i=0;i<stepsLi.length;i++){
 				var step = $(stepsLi[i]),
-				target = step.attr('data-step');
+				target = step.attr('data-step'),
 				content = '<span class="step-text">'+ step.html() +'</span>';
 				
 				step.empty().html('<span class="step-index"><span class="label">'+ (i+1) +'</span></span>'+ content + '<span class="wiz-icon-chevron-right colorA"></span><span class="wiz-icon-chevron-right colorB"></span>');
