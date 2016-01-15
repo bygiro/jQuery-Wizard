@@ -1,6 +1,6 @@
 /*
  * jQuery / jqLite Wizard Plugin
- * version: 0.0.3
+ * version: 0.0.4
  * Author: Girolamo Tomaselli http://bygiro.com
  *
  * Copyright (c) 2013 G. Tomaselli
@@ -114,12 +114,12 @@ if(!bg){
 		
 		that.$element.find('.btn-prev:not(.disabled):not(.hidden)').on('click', function(e){
 			e.stopPropagation();
-			that.previous.call(that,e);
+			that.previous.call(that,true,e);
 		});	
 		
 		that.$element.find('.btn-next').on('click', function(e){
 			e.stopPropagation();
-			that.next.call(that,e);
+			that.next.call(that,true,e);
 		});
 		
 		that.$element.find('.steps > li').on('click', function(e){
@@ -192,13 +192,15 @@ if(!bg){
 		}
 	},
 	
-	moveStep = function(step,direction,event){		
+	moveStep = function(step, direction, event, checkStep){		
 		var canMove = true,
 		steps = this.$element.find('.steps > li'),
 		triggerEnd = false;
 		
+		checkStep = checkStep === false ? false : true;
+
 		// check we can move
-		if(typeof this.options.checkStep == 'function'){
+		if(checkStep && typeof this.options.checkStep == 'function'){
 			canMove = this.options.checkStep(this,direction,event);
 		}
 		
@@ -243,12 +245,22 @@ if(!bg){
 
 			this.$element.addClass('wizard');
 			
+			
 			// add the buttons
 			var stepsBar = this.$element.find('.steps'),
 			topActions = this.$element.find('.top-actions'),
 			bottomActions = this.$element.find('.bottom-actions'),
 			progressBar = this.$element.find('.progress-bar'),
 			html = '';
+			
+			// wrap steps in a container with hidden overflow, if it doesn't have a container
+			if(stepsBar.parent().hasClass('wizard')){
+				// let's add a container
+				stepsBar.wrap('<div class="steps-index-container"></div>');				
+			} else {
+				stepsBar.parent().addClass('steps-index-container');
+			}
+			
 			if(opts.topButtons && stepsBar.length && !topActions.length){
 				html += '<div class="top-actions"><div class="btn-group">';
 				html += '<span class="btn btn-default btn-mini btn-xs btn-prev"><span class="previous-text">'+ opts.text.previous +'</span></span>';
@@ -304,16 +316,16 @@ if(!bg){
 			checkStatus.call(this);
 		},
 
-		next: function(event){			
-			moveStep.call(this,false,true,event);
+		next: function(checkStep,event){
+			moveStep.call(this,false,true,event,checkStep);
 		},
 		
-		previous: function(event){
-			moveStep.call(this,false,false,event);
+		previous: function(checkStep,event){
+			moveStep.call(this,false,false,event,checkStep);
 		},
 		
-		setStep: function(step, event){
-			moveStep.call(this,step,null,event);
+		setStep: function(step, checkStep, event){
+			moveStep.call(this,step,null,event,checkStep);
 		}
 	};
 		

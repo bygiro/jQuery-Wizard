@@ -1,6 +1,6 @@
 /*
  * jQuery / jqLite Wizard Plugin
- * version: 0.0.3
+ * version: 0.0.4
  * Author: Girolamo Tomaselli http://bygiro.com
  *
  * Copyright (c) 2013 G. Tomaselli
@@ -44,8 +44,11 @@
 
 .wizard {
 	border: 1px solid #d4d4d4;
+}
+
+.wizard .steps-index-container {
 	position: relative;
-	overflow: hidden;
+	overflow: hidden;	
 }
 
 .wizard .steps-content{
