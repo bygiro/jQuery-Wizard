@@ -100,8 +100,8 @@ if(!bg){
 		bottomButtons: true,
 		topButtons: true,
 		autoSubmit: false,
-		nextClass: '.btn-next',
-		prevClass: '.btn-prev',
+		keyboard: false,
+		btnClass: 'btn btn-default',
 		text:{
 			finished: 'Complete',
 			next: 'Next',
@@ -110,14 +110,15 @@ if(!bg){
 	},
 	
 	attachEventsHandler = function(){
-		var that = this;
+		var that = this,
+		opts = this.options;
 		
 		that.$element.find('.btn-prev:not(.disabled):not(.hidden)').on('click', function(e){
 			e.stopPropagation();
 			that.previous.call(that,true,e);
 		});	
 		
-		that.$element.find('.btn-next').on('click', function(e){
+		that.$element.find('.btn-next:not(.disabled):not(.hidden)').on('click', function(e){
 			e.stopPropagation();
 			that.next.call(that,true,e);
 		});
@@ -129,7 +130,26 @@ if(!bg){
 			if(!isCompleted) return true;
 			
 			that.setStep.call(that,step,e);
-		});		
+		});
+		
+		$(document).on('keydown', function(e){
+			if(!that.$element.is(':visible')) return;
+			
+			// arrow left
+			if(e.ctrlKey && e.keyCode == 37){
+				e.stopPropagation();
+				e.preventDefault();
+				that.previous.call(that,true,e);
+			}			
+
+			// arrow right
+			if(e.ctrlKey && e.keyCode == 39){
+				e.stopPropagation();
+				e.preventDefault();
+				that.next.call(that,true,e);
+			}
+		});
+
 	},
 	
 	checkStatus = function(){
@@ -263,8 +283,8 @@ if(!bg){
 			
 			if(opts.topButtons && stepsBar.length && !topActions.length){
 				html += '<div class="top-actions"><div class="btn-group">';
-				html += '<span class="btn btn-default btn-mini btn-xs btn-prev"><span class="previous-text">'+ opts.text.previous +'</span></span>';
-				html += '<span class="btn btn-default btn-mini btn-xs btn-next"><span class="next-text">'+ opts.text.next +'</span><span class="finished-text">'+ opts.text.finished +'</span></span>';
+				html += '<span class="'+ opts.btnClass +' btn-prev"><span class="previous-text">'+ opts.text.previous +'</span></span>';
+				html += '<span class="'+ opts.btnClass +' btn-next"><span class="next-text">'+ opts.text.next +'</span><span class="finished-text">'+ opts.text.finished +'</span></span>';
 				html += '</div></div>';
 				
 				stepsBar.after(html);
@@ -273,8 +293,8 @@ if(!bg){
 			html = '';
 			if(opts.bottomButtons && !bottomActions.length){
 				html += '<div class="bottom-actions">';
-				html += '<span class="btn btn-default btn-mini btn-xs btn-prev"><span class="previous-text">'+ opts.text.previous +'</span></span>';
-				html += '<span class="btn btn-default btn-mini btn-xs btn-next"><span class="next-text">'+ opts.text.next +'</span><span class="finished-text">'+ opts.text.finished +'</span></span>';
+				html += '<span class="'+ opts.btnClass +' btn-prev"><span class="previous-text">'+ opts.text.previous +'</span></span>';
+				html += '<span class="'+ opts.btnClass +' btn-next"><span class="next-text">'+ opts.text.next +'</span><span class="finished-text">'+ opts.text.finished +'</span></span>';
 				html += '</div>';
 				
 				that.$element.find('.steps-content').append(html);
