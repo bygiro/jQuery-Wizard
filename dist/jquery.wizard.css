@@ -1,6 +1,6 @@
 /*
  * jQuery / jqLite Wizard Plugin
- * version: 0.0.5
+ * version: 0.0.6
  * Author: Girolamo Tomaselli http://bygiro.com
  *
  * Copyright (c) 2013 G. Tomaselli
@@ -143,19 +143,27 @@
 }
 .wizard .bottom-actions {
 	width: 100%;
+	display: table;
 }
+
+.wizard .left-actions,
+.wizard .right-actions {
+	display: table-cell;
+	width: 50%;
+}
+
+.wizard .left-actions{
+	text-align: left;
+}
+
+.wizard .right-actions {
+	text-align: right;
+}
+
 
 .wizard .bottom-actions .btn-next,
 .wizard .bottom-actions .btn-prev {
 	margin: 10px;
-}
-
-.wizard .bottom-actions .btn-next {
-	float: right;
-}
-
-.wizard .bottom-actions .btn-prev {
-	float: left;
 }
 
 .wizard .steps-content .step-pane:not(.active){

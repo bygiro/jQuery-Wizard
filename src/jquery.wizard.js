@@ -1,6 +1,6 @@
 /*
  * jQuery / jqLite Wizard Plugin
- * version: 0.0.5
+ * version: 0.0.6
  * Author: Girolamo Tomaselli http://bygiro.com
  *
  * Copyright (c) 2013 G. Tomaselli
@@ -18,6 +18,14 @@ if(!bg){
 		(function(){
 			bg.extend = angular.extend;
 			bg.isFunction = angular.isFunction;
+		
+			bg.prototype.is = function (selector){
+				for(var i=0;i<this.length;i++){
+					var el = this[i];
+					if((el.matches || el.matchesSelector || el.msMatchesSelector || el.mozMatchesSelector || el.webkitMatchesSelector || el.oMatchesSelector).call(el, selector)) return true;
+				}
+				return false;
+			}
 		
 			function selectResult(elem, selector){
 				if (elem.length == 1)
@@ -101,7 +109,9 @@ if(!bg){
 		topButtons: true,
 		autoSubmit: false,
 		keyboard: false,
-		btnClass: 'btn btn-default',
+		btnClass: 'btn',
+		btnClassDefault: 'btn-default',
+		btnClassCompleted: 'btn-success',
 		text:{
 			finished: 'Complete',
 			next: 'Next',
@@ -113,12 +123,16 @@ if(!bg){
 		var that = this,
 		opts = this.options;
 		
-		that.$element.find('.btn-prev:not(.disabled):not(.hidden)').on('click', function(e){
+		that.$element.find('.btn-prev').on('click', function(e){
+			if($(this).attr('disabled') || $(this).is('.disabled') || !$(this).is(':visible')) return;
+			
 			e.stopPropagation();
 			that.previous.call(that,true,e);
 		});	
 		
-		that.$element.find('.btn-next:not(.disabled):not(.hidden)').on('click', function(e){
+		that.$element.find('.btn-next').on('click', function(e){
+			//if($(this).attr('disabled') || $(this).is('.disabled') || !$(this).is(':visible')) return;
+
 			e.stopPropagation();
 			that.next.call(that,true,e);
 		});
@@ -158,7 +172,8 @@ if(!bg){
 			stepsWidth = 0,
 			stepPosition = false,
 			steps = that.$element.find('.steps'),
-			stepsItems = that.$element.find('.steps > li');
+			stepsItems = that.$element.find('.steps > li'),
+			opts = that.options;
 			
 		if(!this.currentStep) this.currentStep = 1;
 		
@@ -188,11 +203,11 @@ if(!bg){
 		}
 		
 		// set buttons based on current step
-		that.$element.find('.btn-next').removeClass('final-step btn-success');
+		that.$element.find('.btn-next').removeClass('final-step '+ opts.btnClassCompleted).addClass(opts.btnClassDefault);
 		that.$element.find('.btn-prev').removeClass('disabled hidden');
 		if(that.currentStep == stepsItems.length){
 			// we are in the last step
-			that.$element.find('.btn-next').addClass('final-step btn-success');
+			that.$element.find('.btn-next').removeClass(opts.btnClassDefault).addClass('final-step '+ opts.btnClassCompleted);
 		} else if(that.currentStep == 1){
 			that.$element.find('.btn-prev').addClass('disabled hidden');
 		}		
@@ -213,43 +228,54 @@ if(!bg){
 	},
 	
 	moveStep = function(step, direction, event, checkStep){		
-		var canMove = true,
-		steps = this.$element.find('.steps > li'),
+		var that = this, canMove = true,
+		steps = that.$element.find('.steps > li'),
 		triggerEnd = false;
 		
 		checkStep = checkStep === false ? false : true;
 
 		// check we can move
-		if(checkStep && typeof this.options.checkStep == 'function'){
-			canMove = this.options.checkStep(this,direction,event);
+		if(checkStep){
+			if(typeof that.options.checkStep == 'function'){
+				canMove = that.options.checkStep(that,direction,event);
+			} else {
+				// check we have an angular form inside the step
+				var ngForm,$currStep = that.$element.find('.steps-content .step-pane[data-step="'+ that.currentStep +'"]');
+				if($currStep.scope && $currStep.scope().form){
+					ngForm = $currStep.scope().form;					
+					canMove = !ngForm.$invalid;
+				}
+			}
 		}
 		
 		if(!canMove) return;
 		
 		if(step){
-			this.currentStep = parseInt(step);
+			that.currentStep = parseInt(step);
 		} else {
 			if(direction){
-				this.currentStep++;
+				that.currentStep++;
 			} else {
-				this.currentStep--;
+				that.currentStep--;
 			}
 		}
-
-		if(this.currentStep < 0) this.currentStep = 0;
-		if(this.currentStep > steps.length){
-			this.currentStep = steps.length;
+		
+		that.$element.triggerHandler('step_changed.wizardByGiro');
+		
+		if(that.currentStep < 0) that.currentStep = 0;
+		if(that.currentStep > steps.length){
+			that.currentStep = steps.length;
 			triggerEnd = true;
 		}
 		
-		checkStatus.call(this);
+		checkStatus.call(that);
 		
 		if(triggerEnd){
-			if(typeof this.options.onCompleted == 'function'){
-				this.options.onCompleted(this);
-			} else if(this.options.autoSubmit) {
+			if(typeof that.options.onCompleted == 'function'){
+				that.options.onCompleted(that);
+			} else if(that.options.autoSubmit) {
 				// search if wizard is inside a form and submit it.
-				var form = this.$element.closest('form');
+				var form = that.$element.closest('form');
 				if(form.length)	form.submit();
 			}
 		}
@@ -283,8 +309,8 @@ if(!bg){
 			
 			if(opts.topButtons && stepsBar.length && !topActions.length){
 				html += '<div class="top-actions"><div class="btn-group">';
-				html += '<span class="'+ opts.btnClass +' btn-prev"><span class="previous-text">'+ opts.text.previous +'</span></span>';
-				html += '<span class="'+ opts.btnClass +' btn-next"><span class="next-text">'+ opts.text.next +'</span><span class="finished-text">'+ opts.text.finished +'</span></span>';
+				html += '<span class="'+ opts.btnClass +' '+ opts.btnClassDefault +' btn-prev"><span class="previous-text">'+ opts.text.previous +'</span></span>';
+				html += '<span class="'+ opts.btnClass +' '+ opts.btnClassDefault +' btn-next"><span class="next-text">'+ opts.text.next +'</span><span class="finished-text">'+ opts.text.finished +'</span></span>';
 				html += '</div></div>';
 				
 				stepsBar.after(html);
@@ -293,8 +319,8 @@ if(!bg){
 			html = '';
 			if(opts.bottomButtons && !bottomActions.length){
 				html += '<div class="bottom-actions">';
-				html += '<span class="'+ opts.btnClass +' btn-prev"><span class="previous-text">'+ opts.text.previous +'</span></span>';
-				html += '<span class="'+ opts.btnClass +' btn-next"><span class="next-text">'+ opts.text.next +'</span><span class="finished-text">'+ opts.text.finished +'</span></span>';
+				html += '<div class="left-actions"><span class="'+ opts.btnClass +' '+ opts.btnClassDefault +' btn-prev"><span class="previous-text">'+ opts.text.previous +'</span></span></div>';
+				html += '<div class="right-actions"><span class="'+ opts.btnClass +' '+ opts.btnClassDefault +' btn-next"><span class="next-text">'+ opts.text.next +'</span><span class="finished-text">'+ opts.text.finished +'</span></span></div>';
 				html += '</div>';
 				
 				that.$element.find('.steps-content').append(html);
