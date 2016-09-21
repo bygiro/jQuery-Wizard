@@ -1,13 +1,12 @@
 {
   "name": "jquery-wizard-plugin",
-  "version": "v0.0.5",
+  "version": "v0.0.7",
   "authors": [
     "ByGiro <girotomaselli@gmail.com>"
   ],
   "contributors": [],
   "main": [
-	"dist/jquery.wizard.js",
-	"dist/jquery.wizard.min.js"
+	"dist/jquery.wizard.js"
   ],
   "description": "A simple plugin to convert a regular form into a wizard form.",
   "keywords": [

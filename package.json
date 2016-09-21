@@ -1,6 +1,6 @@
 {
   "name": "jquery-wizard-plugin",
-  "version": "v0.0.5",
+  "version": "v0.0.7",
   "author": "G. Tomaselli <girotomaselli@gmail.com>",
   "contributors": [],
   "homepage": "http://bygiro.com/",
@@ -9,8 +9,7 @@
     "url": "git://github.com/bygiro/jquery-wizard-plugin.git"
   },
   "main": [
-    "dist/jquery.wizard.js",
-    "dist/jquery.wizard.min.js"
+    "dist/jquery.wizard.js"
   ],
   "licenses": [
     {

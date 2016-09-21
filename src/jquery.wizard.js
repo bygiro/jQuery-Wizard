@@ -1,6 +1,6 @@
 /*
  * jQuery / jqLite Wizard Plugin
- * version: 0.0.6
+ * version: 0.0.7
  * Author: Girolamo Tomaselli http://bygiro.com
  *
  * Copyright (c) 2013 G. Tomaselli
@@ -27,51 +27,20 @@ if(!bg){
 				return false;
 			}
 		
-			function selectResult(elem, selector){
-				if (elem.length == 1)
-					return elem[0].querySelectorAll(selector);
-				else {
-					var matches = [];
-					for(var i=0;i<elem.length;i++){
-						var elm = elem[i];
-						var nodes = angular.element(elm.querySelectorAll(selector));
-						matches.push.apply(matches, nodes.slice());					
-					}
-					return matches;
-
-				}
-
-			}	
-		
-			bg.prototype.find = function (selector){			
-				var context = this[0];
+			bg.prototype.find = function (selector){
+				var context = this[0],matches = [];
 				// Early return if context is not an element or document
-				if (!context || (context.nodeType !== 1 && context.nodeType !== 9) || !angular.isString(selector)) {
+				if (!context || (context.nodeType !== 1 && context.nodeType !== 9) || typeof selector != 'string') {
 					return [];
 				}
-				var matches = [];
-				if (selector.charAt(0) === '>')
-					selector = ':scope ' + selector;
-				if (selector.indexOf(':visible') > -1) {
-					var elems = angular.element(selectResult(this, selector.split(':visible')[0]))
-
-					forEach(elems, function (val, i) {
-						if (angular.element(val).is(':visible'))
-							matches.push(val);
-					})
-
-				} else {
-					matches = selectResult(this, selector)
+				
+				for(var i=0;i<this.length;i++){
+					var elm = this[i],
+					nodes = bg(elm.querySelectorAll(selector));
+					matches.push.apply(matches, nodes.slice());
 				}
-
-				if (matches.length) {
-					if (matches.length == 1)
-						return angular.element(matches[0])
-					else {
-						return angular.element(matches);
-					}
-				}
-				return angular.element();
+				
+				return bg(matches);
 			};
 			
 			bg.prototype.outerWidth = function () {
@@ -123,18 +92,12 @@ if(!bg){
 		var that = this,
 		opts = this.options;
 		
-		that.$element.find('.btn-prev').on('click', function(e){
-			if($(this).attr('disabled') || $(this).is('.disabled') || !$(this).is(':visible')) return;
-			
-			e.stopPropagation();
-			that.previous.call(that,true,e);
-		});	
-		
-		that.$element.find('.btn-next').on('click', function(e){
-			//if($(this).attr('disabled') || $(this).is('.disabled') || !$(this).is(':visible')) return;
+		that.$element.find('.btn-next, .btn-prev').on('click', function(e){
+			if($(this).attr('disabled') || $(this).hasClass('disabled') || !$(this).is(':visible')) return;
 
+			var type = $(this).hasClass('btn-next') ? 'next' : 'previous';
 			e.stopPropagation();
-			that.next.call(that,true,e);
+			that[type].call(that,true,e);
 		});
 		
 		that.$element.find('.steps > li').on('click', function(e){
@@ -235,17 +198,8 @@ if(!bg){
 		checkStep = checkStep === false ? false : true;
 
 		// check we can move
-		if(checkStep){
-			if(typeof that.options.checkStep == 'function'){
-				canMove = that.options.checkStep(that,direction,event);
-			} else {
-				// check we have an angular form inside the step
-				var ngForm,$currStep = that.$element.find('.steps-content .step-pane[data-step="'+ that.currentStep +'"]');
-				if($currStep.scope && $currStep.scope().form){
-					ngForm = $currStep.scope().form;					
-					canMove = !ngForm.$invalid;
-				}
-			}
+		if(checkStep && typeof that.options.checkStep == 'function'){
+			canMove = that.options.checkStep(that,direction,event);
 		}
 		
 		if(!canMove) return;
@@ -290,8 +244,7 @@ if(!bg){
 			var opts = this.options;
 
 			this.$element.addClass('wizard');
-			
-			
+						
 			// add the buttons
 			var stepsBar = this.$element.find('.steps'),
 			topActions = this.$element.find('.top-actions'),
